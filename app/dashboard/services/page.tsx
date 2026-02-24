@@ -31,7 +31,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Trash2, Sparkles, Server } from "lucide-react";
 
 const CATEGORIES = [
   { value: "llm", label: "LLM / チャット" },
@@ -95,7 +95,7 @@ export default function ServicesPage() {
     setOpen(false);
   };
 
-  const handlePreset = async (preset: typeof PRESETS[number]) => {
+  const handlePreset = async (preset: (typeof PRESETS)[number]) => {
     if (!user) return;
     await createService({
       userId: user._id,
@@ -114,108 +114,133 @@ export default function ServicesPage() {
   const getCategoryLabel = (value: string) =>
     CATEGORIES.find((c) => c.value === value)?.label ?? value;
 
+  const getPricingLabel = (type: string) => {
+    switch (type) {
+      case "monthly":
+        return "月額固定";
+      case "usage":
+        return "従量課金";
+      case "free":
+        return "無料";
+      default:
+        return type;
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">サービス管理</h1>
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">サービス管理</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            利用中のAIサービスを登録・管理します
+          </p>
+        </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-emerald-600 hover:bg-emerald-700">
+            <Button className="rounded-xl bg-emerald-600 shadow-sm shadow-emerald-600/20 hover:bg-emerald-700">
               <Plus className="mr-2 h-4 w-4" />
               サービスを追加
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle>新しいサービスを追加</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div>
-                <label className="mb-1 block text-sm font-medium">
+                <label className="mb-1.5 block text-sm font-medium">
                   サービス名
                 </label>
                 <Input
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="例: ChatGPT Plus"
+                  className="rounded-lg"
                 />
               </div>
-              <div>
-                <label className="mb-1 block text-sm font-medium">
-                  カテゴリ
-                </label>
-                <Select value={category} onValueChange={setCategory}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {CATEGORIES.map((c) => (
-                      <SelectItem key={c.value} value={c.value}>
-                        {c.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium">
+                    カテゴリ
+                  </label>
+                  <Select value={category} onValueChange={setCategory}>
+                    <SelectTrigger className="rounded-lg">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CATEGORIES.map((c) => (
+                        <SelectItem key={c.value} value={c.value}>
+                          {c.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium">
+                    プロバイダー
+                  </label>
+                  <Select value={provider} onValueChange={setProvider}>
+                    <SelectTrigger className="rounded-lg">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PROVIDERS.map((p) => (
+                        <SelectItem key={p} value={p}>
+                          {p}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
-              <div>
-                <label className="mb-1 block text-sm font-medium">
-                  プロバイダー
-                </label>
-                <Select value={provider} onValueChange={setProvider}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {PROVIDERS.map((p) => (
-                      <SelectItem key={p} value={p}>
-                        {p}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label className="mb-1 block text-sm font-medium">
-                  料金タイプ
-                </label>
-                <Select value={pricingType} onValueChange={setPricingType}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="monthly">月額固定</SelectItem>
-                    <SelectItem value="usage">従量課金</SelectItem>
-                    <SelectItem value="free">無料</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label className="mb-1 block text-sm font-medium">
-                  月額料金 (¥)
-                </label>
-                <Input
-                  type="number"
-                  value={monthlyPrice}
-                  onChange={(e) => setMonthlyPrice(e.target.value)}
-                  placeholder="例: 3000"
-                />
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium">
+                    料金タイプ
+                  </label>
+                  <Select value={pricingType} onValueChange={setPricingType}>
+                    <SelectTrigger className="rounded-lg">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="monthly">月額固定</SelectItem>
+                      <SelectItem value="usage">従量課金</SelectItem>
+                      <SelectItem value="free">無料</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium">
+                    月額料金 (¥)
+                  </label>
+                  <Input
+                    type="number"
+                    value={monthlyPrice}
+                    onChange={(e) => setMonthlyPrice(e.target.value)}
+                    placeholder="例: 3000"
+                    className="rounded-lg"
+                  />
+                </div>
               </div>
               <Button
                 onClick={handleSubmit}
-                className="w-full bg-emerald-600 hover:bg-emerald-700"
+                className="w-full rounded-xl bg-emerald-600 hover:bg-emerald-700"
               >
-                追加
+                追加する
               </Button>
             </div>
           </DialogContent>
         </Dialog>
       </div>
 
-      {/* プリセット */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">
-            クイック追加（プリセット）
+      {/* Presets */}
+      <Card className="border-0 shadow-sm">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Sparkles className="h-4 w-4 text-emerald-600" />
+            クイック追加
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -225,63 +250,77 @@ export default function ServicesPage() {
                 key={preset.name}
                 variant="outline"
                 size="sm"
+                className="rounded-lg border-dashed transition-all hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700"
                 onClick={() => handlePreset(preset)}
               >
-                <Plus className="mr-1 h-3 w-3" />
-                {preset.name} (¥{preset.price.toLocaleString()}/月)
+                <Plus className="mr-1.5 h-3 w-3" />
+                {preset.name}
+                <span className="ml-1.5 text-muted-foreground">
+                  ¥{preset.price.toLocaleString()}/月
+                </span>
               </Button>
             ))}
           </div>
         </CardContent>
       </Card>
 
-      {/* テーブル */}
-      <Card>
-        <CardContent className="pt-6">
+      {/* Table */}
+      <Card className="border-0 shadow-sm">
+        <CardContent className="p-0">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>サービス名</TableHead>
+              <TableRow className="hover:bg-transparent">
+                <TableHead className="pl-6">サービス名</TableHead>
                 <TableHead>カテゴリ</TableHead>
                 <TableHead>プロバイダー</TableHead>
                 <TableHead>料金タイプ</TableHead>
                 <TableHead className="text-right">月額</TableHead>
                 <TableHead>ステータス</TableHead>
-                <TableHead className="text-right">操作</TableHead>
+                <TableHead className="pr-6 text-right">操作</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {services && services.length > 0 ? (
                 services.map((service) => (
-                  <TableRow key={service._id}>
-                    <TableCell className="font-medium">
+                  <TableRow key={service._id} className="group">
+                    <TableCell className="pl-6 font-medium">
                       {service.name}
                     </TableCell>
-                    <TableCell>{getCategoryLabel(service.category)}</TableCell>
-                    <TableCell>{service.provider}</TableCell>
                     <TableCell>
-                      {service.pricingType === "monthly"
-                        ? "月額固定"
-                        : service.pricingType === "usage"
-                          ? "従量課金"
-                          : "無料"}
+                      <span className="text-sm text-muted-foreground">
+                        {getCategoryLabel(service.category)}
+                      </span>
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell>
+                      <span className="text-sm">{service.provider}</span>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="secondary" className="rounded-md font-normal">
+                        {getPricingLabel(service.pricingType)}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right font-medium">
                       {service.monthlyPrice
                         ? `¥${service.monthlyPrice.toLocaleString()}`
-                        : "—"}
+                        : "---"}
                     </TableCell>
                     <TableCell>
                       <Badge
                         variant={service.isActive ? "default" : "secondary"}
+                        className={
+                          service.isActive
+                            ? "rounded-md bg-emerald-100 text-emerald-700 hover:bg-emerald-100"
+                            : "rounded-md"
+                        }
                       >
                         {service.isActive ? "有効" : "無効"}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="pr-6 text-right">
                       <Button
                         variant="ghost"
                         size="icon"
+                        className="h-8 w-8 opacity-0 transition-opacity group-hover:opacity-100"
                         onClick={() => handleDelete(service._id)}
                       >
                         <Trash2 className="h-4 w-4 text-destructive" />
@@ -291,8 +330,15 @@ export default function ServicesPage() {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center text-muted-foreground">
-                    サービスが登録されていません。上の「サービスを追加」から始めましょう。
+                  <TableCell
+                    colSpan={7}
+                    className="h-32 text-center text-muted-foreground"
+                  >
+                    <div className="flex flex-col items-center gap-2">
+                      <Server className="h-8 w-8 text-muted-foreground/30" />
+                      <p>サービスが登録されていません</p>
+                      <p className="text-sm">上の「サービスを追加」から始めましょう</p>
+                    </div>
                   </TableCell>
                 </TableRow>
               )}
